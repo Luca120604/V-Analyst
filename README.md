@@ -2,6 +2,10 @@
 
 Mobile PWA für Vinted-Listings. Foto rein → KI-Analyse → fertiges Listing → Copy in Vinted.
 
+**Live:**
+- App: <https://vinted-helper.pages.dev>
+- Worker (API): <https://vinted-helper-api.luca1206acc.workers.dev>
+
 **Stack:** React 18 + Vite + Tailwind + vite-plugin-pwa + localStorage  
 **AI:** Google Gemini (Flash/Pro) via Cloudflare Worker Proxy  
 **Hosting:** Cloudflare Pages (Frontend) + Cloudflare Workers (API)
