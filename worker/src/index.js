@@ -1,7 +1,7 @@
 import { SYSTEM_PROMPT, ITEM_RESPONSE_SCHEMA } from "./prompt.js";
 
 const MODEL_MAP = {
-  flash: "gemini-2.0-flash-exp",
+  flash: "gemini-2.5-flash",
   pro: "gemini-2.5-pro",
 };
 
