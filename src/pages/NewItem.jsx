@@ -14,24 +14,28 @@ export default function NewItem({ nextId, modelChoice, onCancel, onCreate }) {
   async function runAI() {
     try {
       const items = await analyze(draft.photos, { model: modelChoice });
-      if (items && items.length > 0) {
-        const first = items[0];
-        update({
-          title: first.title || draft.title,
-          description: first.description || draft.description,
-          category: first.category || draft.category,
-          brand: first.brand || draft.brand,
-          size: first.size || draft.size,
-          condition: first.condition || draft.condition,
-          color: first.color || draft.color,
-          material: first.material || draft.material,
-          price_recommended: first.price_recommended ?? draft.price_recommended,
-          price_range: first.price_range || draft.price_range,
-          shipping_size: first.shipping_size || draft.shipping_size,
-          tags_implicit: first.tags_implicit || draft.tags_implicit,
-          notes_for_user: first.notes_for_user || draft.notes_for_user,
-        });
-      }
+      if (!items || items.length === 0) return;
+      const first = items[0];
+      const filled = {
+        ...draft,
+        title: first.title || draft.title,
+        description: first.description || draft.description,
+        category: first.category || draft.category,
+        brand: first.brand || draft.brand,
+        size: first.size || draft.size,
+        condition: first.condition || draft.condition,
+        color: first.color || draft.color,
+        material: first.material || draft.material,
+        price_recommended: first.price_recommended ?? draft.price_recommended,
+        price_range: first.price_range || draft.price_range,
+        shipping_size: first.shipping_size || draft.shipping_size,
+        tags_implicit: first.tags_implicit || draft.tags_implicit,
+        notes_for_user: first.notes_for_user || draft.notes_for_user,
+        status: "ready",
+        created_at: Date.now(),
+        updated_at: Date.now(),
+      };
+      onCreate(filled);
     } catch (e) {
       console.error(e);
     }
