@@ -14,7 +14,10 @@ export default function NewItem({ nextId, modelChoice, onCancel, onCreate }) {
   async function runAI() {
     try {
       const items = await analyze(draft.photos, { model: modelChoice });
-      if (!items || items.length === 0) return;
+      if (!items || items.length === 0) {
+        alert("KI hat kein Ergebnis geliefert. Bitte erneut versuchen oder manuell ausfüllen.");
+        return;
+      }
       const first = items[0];
       const filled = {
         ...draft,

@@ -89,8 +89,11 @@ export default function App() {
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950">
       <main
-        className="max-w-3xl mx-auto px-4 pt-4"
-        style={{ paddingBottom: "calc(80px + env(safe-area-inset-bottom))" }}
+        className="max-w-3xl mx-auto px-4"
+        style={{
+          paddingTop: "calc(16px + env(safe-area-inset-top))",
+          paddingBottom: "calc(80px + env(safe-area-inset-bottom))",
+        }}
       >
         {body}
       </main>
