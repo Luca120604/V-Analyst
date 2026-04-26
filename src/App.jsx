@@ -37,7 +37,7 @@ export default function App() {
   }
 
   function resetSeed() {
-    if (!confirm("Aktuelle Items mit Demo-Daten überschreiben?")) return;
+    if (!confirm("Aktuelle Artikel mit Demo-Daten überschreiben?")) return;
     setItems(SEED_ITEMS);
     setOpenItemId(null);
   }
@@ -58,7 +58,13 @@ export default function App() {
       />
     );
   } else if (tab === "home") {
-    body = <Home items={items} onOpen={(id) => setOpenItemId(id)} />;
+    body = (
+      <Home
+        items={items}
+        onOpen={(id) => setOpenItemId(id)}
+        onAdd={() => setTab("new")}
+      />
+    );
   } else if (tab === "new") {
     body = (
       <NewItem
@@ -81,10 +87,10 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
+    <div className="min-h-screen bg-white dark:bg-zinc-950">
       <main
         className="max-w-3xl mx-auto px-4 pt-4"
-        style={{ paddingBottom: "calc(72px + env(safe-area-inset-bottom))" }}
+        style={{ paddingBottom: "calc(80px + env(safe-area-inset-bottom))" }}
       >
         {body}
       </main>

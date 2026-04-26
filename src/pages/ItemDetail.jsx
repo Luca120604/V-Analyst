@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Save, Trash2 } from "lucide-react";
+import { ArrowLeft, Save, Trash2, Pencil } from "lucide-react";
 import Field from "../components/Field.jsx";
 import CopyButton from "../components/CopyButton.jsx";
 import PhotoCarousel from "../components/PhotoCarousel.jsx";
@@ -7,6 +7,8 @@ import PhotoUpload from "../components/PhotoUpload.jsx";
 import StatusBadge from "../components/StatusBadge.jsx";
 import { CONDITIONS, SHIPPING_SIZES, STATUSES } from "../lib/schema.js";
 import { VINTED_CATEGORIES } from "../lib/vintedCategories.js";
+
+const STATUS_LABELS = { draft: "Entwurf", ready: "Bereit", published: "Online" };
 
 export default function ItemDetail({ item, onBack, onSave, onDelete }) {
   const [draft, setDraft] = useState(item);
@@ -27,80 +29,105 @@ export default function ItemDetail({ item, onBack, onSave, onDelete }) {
 
   return (
     <div>
-      <header className="mb-4 flex items-center justify-between gap-2">
+      <header className="mb-4 -mx-4 px-4 flex items-center justify-between gap-2">
         <button
           type="button"
           onClick={onBack}
-          className="btn-ghost"
+          className="inline-flex items-center justify-center w-10 h-10 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-700 dark:text-zinc-200"
           aria-label="Zurück"
         >
-          <ArrowLeft size={18} />
-          Zurück
+          <ArrowLeft size={20} />
         </button>
-        <div className="flex items-center gap-2">
-          {!editing ? (
-            <button type="button" onClick={() => setEditing(true)} className="btn-secondary">
-              Bearbeiten
-            </button>
-          ) : (
-            <button type="button" onClick={save} className="btn-primary">
-              <Save size={16} />
-              Speichern
-            </button>
-          )}
-        </div>
+        {!editing ? (
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[13px] font-medium bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100"
+            style={{ minHeight: 40 }}
+          >
+            <Pencil size={14} />
+            Bearbeiten
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={save}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-[13px] font-semibold bg-zinc-900 dark:bg-white text-white dark:text-zinc-900"
+            style={{ minHeight: 40 }}
+          >
+            <Save size={14} />
+            Speichern
+          </button>
+        )}
       </header>
 
-      <div className="card p-3 mb-3">
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-xs font-mono text-zinc-500">#{draft.item_id}</span>
-          <StatusBadge status={draft.status} />
-        </div>
+      <div className="-mx-4 mb-4">
         <PhotoCarousel photos={draft.photos} />
-        {editing && (
-          <div className="mt-3">
-            <PhotoUpload
-              photos={draft.photos || []}
-              onChange={(photos) => update({ photos })}
-            />
-          </div>
-        )}
       </div>
 
-      <div className="card p-3 mb-3">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Listing</h2>
-          <CopyButton value={fullBlock} label="Titel + Beschreibung" size="lg" />
+      {editing && (
+        <div className="mb-4">
+          <PhotoUpload
+            photos={draft.photos || []}
+            onChange={(photos) => update({ photos })}
+          />
         </div>
+      )}
 
-        {editing ? (
-          <EditForm draft={draft} update={update} />
-        ) : (
-          <ReadView draft={draft} />
-        )}
+      <div className="flex items-center gap-2 mb-3">
+        <StatusBadge status={draft.status} />
+        <span className="text-[11px] text-zinc-400 font-mono">#{draft.item_id}</span>
+      </div>
 
-        {draft.notes_for_user && (
-          <div className="mt-3 text-xs text-amber-600 dark:text-amber-400 italic">
-            Hinweis: {draft.notes_for_user}
-          </div>
+      <h1 className="text-[20px] font-semibold text-zinc-900 dark:text-zinc-100 mb-1 leading-tight">
+        {draft.title || "Ohne Titel"}
+      </h1>
+      <div className="flex items-baseline gap-2 mb-4">
+        <span className="text-[22px] font-bold text-zinc-900 dark:text-zinc-100">
+          {draft.price_recommended || 0} €
+        </span>
+        {draft.price_range && (
+          <span className="text-[12px] text-zinc-500">{draft.price_range}</span>
         )}
       </div>
 
-      <div className="card p-3 mb-3">
-        <h2 className="text-sm font-semibold mb-2 text-zinc-900 dark:text-zinc-100">Status</h2>
-        <div className="flex gap-2 flex-wrap">
+      <div className="mb-5">
+        <CopyButton value={fullBlock} label="Für Vinted kopieren" variant="primary" />
+      </div>
+
+      {editing ? (
+        <div className="mb-4">
+          <EditForm draft={draft} update={update} />
+        </div>
+      ) : (
+        <div className="mb-4">
+          <ReadView draft={draft} />
+        </div>
+      )}
+
+      {draft.notes_for_user && !editing && (
+        <div className="mb-4 px-3 py-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/30 text-[12px] text-amber-700 dark:text-amber-300">
+          {draft.notes_for_user}
+        </div>
+      )}
+
+      <div className="mb-5">
+        <div className="text-[10px] uppercase tracking-wider text-zinc-400 font-medium mb-2">
+          Status
+        </div>
+        <div className="flex gap-1.5 flex-wrap">
           {STATUSES.map((s) => (
             <button
               key={s}
               type="button"
               onClick={() => onSave({ ...draft, status: s, updated_at: Date.now() })}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition ${
+              className={`px-3.5 py-1.5 rounded-full text-[12px] font-medium transition ${
                 draft.status === s
-                  ? "bg-emerald-600 text-white"
-                  : "bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+                  ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
+                  : "bg-zinc-100 text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400"
               }`}
             >
-              {s === "draft" ? "Draft" : s === "ready" ? "Ready" : "Online"}
+              {STATUS_LABELS[s]}
             </button>
           ))}
         </div>
@@ -109,11 +136,11 @@ export default function ItemDetail({ item, onBack, onSave, onDelete }) {
       <button
         type="button"
         onClick={() => {
-          if (confirm("Item wirklich löschen?")) onDelete(draft.item_id);
+          if (confirm("Artikel wirklich löschen?")) onDelete(draft.item_id);
         }}
-        className="btn-ghost text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30"
+        className="inline-flex items-center gap-1.5 text-[13px] text-red-600 dark:text-red-400 px-2 py-2"
       >
-        <Trash2 size={16} />
+        <Trash2 size={14} />
         Löschen
       </button>
     </div>
@@ -123,16 +150,13 @@ export default function ItemDetail({ item, onBack, onSave, onDelete }) {
 function ReadView({ draft }) {
   return (
     <>
-      <Field label="Titel" value={draft.title} />
       <Field label="Beschreibung" value={draft.description} multiline />
-      <Field label="Kategorie" value={draft.category} />
       <Field label="Marke" value={draft.brand} />
       <Field label="Größe" value={draft.size} />
       <Field label="Zustand" value={draft.condition} />
       <Field label="Farbe" value={draft.color} />
       <Field label="Material" value={draft.material} />
-      <Field label="Preis" value={draft.price_recommended ? `${draft.price_recommended} €` : ""} />
-      <Field label="Range" value={draft.price_range} />
+      <Field label="Kategorie" value={draft.category} />
       <Field label="Versand" value={draft.shipping_size} />
     </>
   );
@@ -148,7 +172,7 @@ function EditForm({ draft, update }) {
           maxLength={50}
           onChange={(e) => update({ title: e.target.value })}
         />
-        <span className="text-[10px] text-zinc-500">{(draft.title || "").length}/50</span>
+        <span className="text-[10px] text-zinc-400">{(draft.title || "").length}/50</span>
       </FormField>
       <FormField label="Beschreibung">
         <textarea
@@ -235,7 +259,7 @@ function EditForm({ draft, update }) {
             onChange={(e) => update({ price_recommended: Number(e.target.value) || 0 })}
           />
         </FormField>
-        <FormField label="Range">
+        <FormField label="Preis-Range">
           <input
             className="input"
             value={draft.price_range || ""}
@@ -258,7 +282,9 @@ function EditForm({ draft, update }) {
 function FormField({ label, children }) {
   return (
     <label className="block">
-      <div className="text-[10px] uppercase tracking-wide text-zinc-500 mb-1">{label}</div>
+      <div className="text-[10px] uppercase tracking-wider text-zinc-400 font-medium mb-1">
+        {label}
+      </div>
       {children}
     </label>
   );

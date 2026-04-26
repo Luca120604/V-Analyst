@@ -60,18 +60,26 @@ export default function PhotoUpload({ photos, onChange, max = 8 }) {
 
   return (
     <div>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-1.5">
         {photos.map((p, idx) => (
-          <div key={idx} className="relative aspect-square rounded-md overflow-hidden bg-zinc-200 dark:bg-zinc-800">
+          <div
+            key={idx}
+            className="relative aspect-square rounded-md overflow-hidden bg-zinc-200 dark:bg-zinc-800"
+          >
             <img src={p} alt={`Foto ${idx + 1}`} className="w-full h-full object-cover" />
             <button
               type="button"
               onClick={() => removePhoto(idx)}
-              className="absolute top-1 right-1 p-1 rounded-full bg-zinc-900/70 text-white"
+              className="absolute top-1.5 right-1.5 p-1 rounded-full bg-zinc-900/80 text-white"
               aria-label="Foto entfernen"
             >
               <X size={14} />
             </button>
+            {idx === 0 && (
+              <span className="absolute bottom-1.5 left-1.5 text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-zinc-900/80 text-white">
+                Cover
+              </span>
+            )}
           </div>
         ))}
         {canAdd && (
@@ -80,19 +88,19 @@ export default function PhotoUpload({ photos, onChange, max = 8 }) {
               type="button"
               onClick={() => cameraRef.current?.click()}
               disabled={busy}
-              className="aspect-square rounded-md border-2 border-dashed border-zinc-300 dark:border-zinc-700 flex flex-col items-center justify-center gap-1 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition"
+              className="aspect-square rounded-md bg-zinc-100 dark:bg-zinc-900 flex flex-col items-center justify-center gap-1 text-zinc-500 active:scale-[0.98] transition"
             >
               {busy ? <Loader2 size={20} className="animate-spin" /> : <Camera size={20} />}
-              <span className="text-[10px] uppercase tracking-wide">Kamera</span>
+              <span className="text-[10px] uppercase tracking-wider">Kamera</span>
             </button>
             <button
               type="button"
               onClick={() => galleryRef.current?.click()}
               disabled={busy}
-              className="aspect-square rounded-md border-2 border-dashed border-zinc-300 dark:border-zinc-700 flex flex-col items-center justify-center gap-1 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition"
+              className="aspect-square rounded-md bg-zinc-100 dark:bg-zinc-900 flex flex-col items-center justify-center gap-1 text-zinc-500 active:scale-[0.98] transition"
             >
               {busy ? <Loader2 size={20} className="animate-spin" /> : <ImagePlus size={20} />}
-              <span className="text-[10px] uppercase tracking-wide">Galerie</span>
+              <span className="text-[10px] uppercase tracking-wider">Galerie</span>
             </button>
           </>
         )}
@@ -119,8 +127,8 @@ export default function PhotoUpload({ photos, onChange, max = 8 }) {
           e.target.value = "";
         }}
       />
-      <p className="mt-2 text-[11px] text-zinc-500">
-        {photos.length}/{max} Fotos · automatisch komprimiert auf max. 1280px
+      <p className="mt-2 text-[11px] text-zinc-400">
+        {photos.length}/{max} · komprimiert auf max. 1280px
       </p>
     </div>
   );

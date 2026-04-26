@@ -42,88 +42,115 @@ export default function NewItem({ nextId, modelChoice, onCancel, onCreate }) {
       alert("Mindestens ein Foto, Titel oder Marke nötig.");
       return;
     }
-    const now = Date.now();
-    onCreate({ ...draft, created_at: now, updated_at: now });
+    onCreate({ ...draft, created_at: Date.now(), updated_at: Date.now() });
   }
+
+  const hasPhotos = draft.photos.length > 0;
+  const hasContent = draft.title || draft.brand || hasPhotos;
 
   return (
     <div>
-      <header className="mb-4 flex items-center justify-between gap-2">
-        <button type="button" onClick={onCancel} className="btn-ghost">
-          <ArrowLeft size={18} />
-          Abbrechen
+      <header className="mb-4 -mx-4 px-4 flex items-center justify-between gap-2">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="inline-flex items-center justify-center w-10 h-10 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-700 dark:text-zinc-200"
+          aria-label="Abbrechen"
+        >
+          <ArrowLeft size={20} />
         </button>
-        <button type="button" onClick={save} className="btn-primary">
-          <Save size={16} />
+        <button
+          type="button"
+          onClick={save}
+          disabled={!hasContent}
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-[13px] font-semibold bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 disabled:opacity-40"
+          style={{ minHeight: 40 }}
+        >
+          <Save size={14} />
           Speichern
         </button>
       </header>
 
-      <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-3">Neues Item</h1>
+      <h1 className="text-[22px] font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mb-1">
+        Artikel scannen
+      </h1>
+      <p className="text-[13px] text-zinc-500 mb-5">
+        Fotografiere deinen Artikel. Die KI erkennt Marke, Größe, Zustand und schlägt Titel + Preis vor.
+      </p>
 
-      <div className="card p-3 mb-3">
-        <h2 className="text-sm font-semibold mb-2 text-zinc-900 dark:text-zinc-100">Fotos</h2>
-        <PhotoUpload
-          photos={draft.photos}
-          onChange={(photos) => update({ photos })}
-        />
+      <div className="mb-5">
+        <PhotoUpload photos={draft.photos} onChange={(photos) => update({ photos })} />
       </div>
 
-      <div className="card p-3 mb-3">
-        <AIAnalyzeButton
-          onClick={runAI}
-          loading={loading}
-          disabled={draft.photos.length === 0}
-        />
+      <div className="mb-5">
+        <AIAnalyzeButton onClick={runAI} loading={loading} disabled={!hasPhotos} />
         {error && (
-          <p className="mt-2 text-xs text-red-500 break-words">{error}</p>
+          <p className="mt-2 text-[12px] text-red-500 break-words">{error}</p>
         )}
-        {draft.photos.length === 0 && (
-          <p className="mt-2 text-xs text-zinc-500">
-            Erst Fotos hinzufügen, dann KI-Analyse starten.
+        {!hasPhotos && (
+          <p className="mt-2 text-[11px] text-zinc-400 text-center">
+            Erst Fotos hinzufügen
           </p>
         )}
       </div>
 
-      <div className="card p-3 mb-3 space-y-3">
-        <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Manuell ausfüllen</h2>
-        <SimpleField label="Titel">
-          <input
-            className="input"
-            maxLength={50}
-            value={draft.title}
-            onChange={(e) => update({ title: e.target.value })}
-            placeholder="[Marke] [Item] [Merkmal] [Größe]"
-          />
-        </SimpleField>
-        <SimpleField label="Beschreibung">
-          <textarea
-            className="input min-h-[120px]"
-            value={draft.description}
-            onChange={(e) => update({ description: e.target.value })}
-          />
-        </SimpleField>
-        <div className="grid grid-cols-2 gap-3">
-          <SimpleField label="Marke">
-            <input className="input" value={draft.brand} onChange={(e) => update({ brand: e.target.value })} />
-          </SimpleField>
-          <SimpleField label="Größe">
-            <input className="input" value={draft.size} onChange={(e) => update({ size: e.target.value })} />
-          </SimpleField>
-          <SimpleField label="Preis (€)">
+      <details className="mb-3">
+        <summary className="text-[12px] uppercase tracking-wider text-zinc-400 font-medium cursor-pointer select-none">
+          Manuell ausfüllen
+        </summary>
+        <div className="mt-3 space-y-3">
+          <SimpleField label="Titel">
             <input
-              type="number"
-              inputMode="decimal"
               className="input"
-              value={draft.price_recommended || 0}
-              onChange={(e) => update({ price_recommended: Number(e.target.value) || 0 })}
+              maxLength={50}
+              value={draft.title}
+              onChange={(e) => update({ title: e.target.value })}
+              placeholder="z.B. Levi's 501 Jeans dunkelblau W32"
             />
           </SimpleField>
-          <SimpleField label="Farbe">
-            <input className="input" value={draft.color} onChange={(e) => update({ color: e.target.value })} />
+          <SimpleField label="Beschreibung">
+            <textarea
+              className="input min-h-[100px]"
+              value={draft.description}
+              onChange={(e) => update({ description: e.target.value })}
+            />
           </SimpleField>
+          <div className="grid grid-cols-2 gap-3">
+            <SimpleField label="Marke">
+              <input
+                className="input"
+                value={draft.brand}
+                onChange={(e) => update({ brand: e.target.value })}
+              />
+            </SimpleField>
+            <SimpleField label="Größe">
+              <input
+                className="input"
+                value={draft.size}
+                onChange={(e) => update({ size: e.target.value })}
+              />
+            </SimpleField>
+            <SimpleField label="Preis (€)">
+              <input
+                type="number"
+                inputMode="decimal"
+                className="input"
+                value={draft.price_recommended || 0}
+                onChange={(e) =>
+                  update({ price_recommended: Number(e.target.value) || 0 })
+                }
+              />
+            </SimpleField>
+            <SimpleField label="Farbe">
+              <input
+                className="input"
+                value={draft.color}
+                onChange={(e) => update({ color: e.target.value })}
+              />
+            </SimpleField>
+          </div>
         </div>
-      </div>
+      </details>
     </div>
   );
 }
@@ -131,7 +158,9 @@ export default function NewItem({ nextId, modelChoice, onCancel, onCreate }) {
 function SimpleField({ label, children }) {
   return (
     <label className="block">
-      <div className="text-[10px] uppercase tracking-wide text-zinc-500 mb-1">{label}</div>
+      <div className="text-[10px] uppercase tracking-wider text-zinc-400 font-medium mb-1">
+        {label}
+      </div>
       {children}
     </label>
   );
